@@ -1,140 +1,131 @@
-//Bank management system
-#include <iostream>
-#include <conio.h>
-using namespace std;
-class bank
-{
-	string surname;
-	string name;
-	string add;
-	string num;
-	char type;
-	float balance;
-	int chr;
-	bool acc_created=false;
-	public:
-		void open_account();
-		void deposite_money();
-		void withdraw_money();
-		void display_account();
+#include <stdio.h>
+#include <string.h>
+
+struct Bank {
+    char surname[50];
+    char name[50];
+    char add[100];
+    char num[11];
+    char type;
+    float balance;
+    int acc_created;
 };
-void bank::open_account()
-{
-	cout<<"Enter Your full surname:";
-	cin.ignore();
-	getline(cin,surname);
-	cout<<"Enter your name :";
-	getline(cin,name);
-	cout<<"Enter your address :";
-	getline(cin,add);
-	cout<<"Enter your mobile number:";
-	getline(cin,num);
-	if(num.length()>10||num.length()<10)
-	{
-		cout<<"Invalid number.Please enter again!\n";
-		cout<<"Enter your mobile number:";
-		getline(cin,num);
-	}
-	cout<<"What type of account you want to open? Saving (s) or Current (C):";
-    cin>>type;
-    cout<<"Enter amount for deposit: ";
-    cin>>balance;
-    cout<<"Your account is successfully created"<<"\n";
-    acc_created=true;
-}
-void bank::deposite_money()
-{
-	int a;
-	cout<<"Enter how much money you want to deposite:";
-	cin>>a;
-	balance+=a;
-	cout<<"Your current total balance: "<<balance<<"\n";
-}
-void bank::display_account()
-{
-	if(acc_created==true)
-	{
-	cout<<"Your full name:"<<surname<<"."<<name<<"\n";
-	cout<<"Your address:"<<add<<"\n";
-	cout<<"Your mobile number:"<<num<<"\n";
-	cout<<"Type of account:"<<type<<"\n";
-	cout<<"Amount you deposited:"<<balance<<"\n";
-   }
-   else
-   {
-   	cout<<"Oops no account found! Create one!\n";
-   	cout<<"Create an account? Press Y/N:\n";
-   	chr=getch();
-   	if(chr=='Y'||chr=='y')
-   	{
-	   open_account();
+
+void open_account(struct Bank *acc) {
+    printf("Enter Your full surname: ");
+    getchar(); // Clear input buffer
+    fgets(acc->surname, sizeof(acc->surname), stdin);
+    acc->surname[strcspn(acc->surname, "\n")] = '\0'; // Remove newline
+
+    printf("Enter your name: ");
+    fgets(acc->name, sizeof(acc->name), stdin);
+    acc->name[strcspn(acc->name, "\n")] = '\0'; // Remove newline
+
+    printf("Enter your address: ");
+    fgets(acc->add, sizeof(acc->add), stdin);
+    acc->add[strcspn(acc->add, "\n")] = '\0'; // Remove newline
+
+    printf("Enter your mobile number: ");
+    fgets(acc->num, sizeof(acc->num), stdin);
+    acc->num[strcspn(acc->num, "\n")] = '\0'; // Remove newline
+
+    while (strlen(acc->num) != 10) {
+        printf("Invalid number. Please enter a 10-digit number: ");
+        fgets(acc->num, sizeof(acc->num), stdin);
+        acc->num[strcspn(acc->num, "\n")] = '\0'; // Remove newline
     }
 
-   }
+    printf("What type of account you want to open? Saving (s) or Current (C): ");
+    scanf(" %c", &acc->type);
+
+    printf("Enter amount for deposit: ");
+    scanf("%f", &acc->balance);
+
+    printf("Your account is successfully created\n");
+    acc->acc_created = 1;
 }
-void bank::withdraw_money()
-{
-	float amount;
-	cout<<"WITHDRAW\n";
-	cout<<"Enter amount to withdraw:";
-	cin>>amount;
-	if(balance>=amount)
-	{
-	balance-=amount;
-	cout<<"Now total amount left in your account:\t"<<balance<<"\n";
-    }
-    else
-    {
-	cout<<"Sorry! Insufficient balance\n";
+
+void deposit_money(struct Bank *acc) {
+    float a;
+    printf("Enter how much money you want to deposit: ");
+    scanf("%f", &a);
+    acc->balance += a;
+    printf("Your current total balance: %.2f\n", acc->balance);
+}
+
+void display_account(struct Bank *acc) {
+    if (acc->acc_created == 1) {
+        printf("Your full name: %s %s\n", acc->surname, acc->name);
+        printf("Your address: %s\n", acc->add);
+        printf("Your mobile number: %s\n", acc->num);
+        printf("Type of account: %c\n", acc->type);
+        printf("Amount you deposited: %.2f\n", acc->balance);
+    } else {
+        printf("Oops, no account found! Create one!\n");
     }
 }
-int main()
-{
-	int ch;
-	char x;
-	bank obj;
-	do
-	{
-	cout<<"1.Open Account \n";
-	cout<<"2.Deposit money \n";
-	cout<<"3.withdraw money \n";
-	cout<<"4.Diplay account \n";
-	cout<<"5.Exit\n";
-	cout<<"Select the option from the above:\n";
-	cin>>ch;
-	switch(ch)
-	{
-		case 1:cout<<"\n >> Open Account\n";
-		obj.open_account();
-		break;
-		
-		case 2:cout<<">> Deposit money\n";
-		obj.deposite_money();
-		break;
-		
-		case 3:cout<<">> Withdraw money\n";
-		obj.withdraw_money();
-		break;
-		
-		case 4:cout<<">> Display Account\n";
-		obj.display_account();
-		break;
-		
-		case 5:cout<<"Thankyou!!!\nHope you had a safe transaction :)";
-		exit(1);
-		
-		default:
-			cout<<"This doesn't exist. Please try again!\n";
-	}
-	cout<<"Do you want to select any other option? Press Y/N\n";
-	cout<<"If you want to exit then press 'N' \n";
-	x=getch();
-	if(x=='n'||x=='N')
-	{
-		cout<<"Thankyou!!!\nHope you had a safe transaction :)";
-		exit(0);
-	}
-	}while(x=='y'||x=='Y');
-	getch();
-	return 0;
+
+void withdraw_money(struct Bank *acc) {
+    float amount;
+    printf("WITHDRAW\n");
+    printf("Enter amount to withdraw: ");
+    scanf("%f", &amount);
+    if (acc->balance >= amount) {
+        acc->balance -= amount;
+        printf("Now total amount left in your account: %.2f\n", acc->balance);
+    } else {
+        printf("Sorry! Insufficient balance\n");
+    }
+}
+
+int main() {
+    int choice;
+    char option;
+    struct Bank account;
+    account.acc_created = 0;
+
+    do {
+        printf("1. Open Account\n");
+        printf("2. Deposit money\n");
+        printf("3. Withdraw money\n");
+        printf("4. Display Account\n");
+        printf("5. Exit\n");
+        printf("Select an option from the above: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf(">> Open Account\n");
+                open_account(&account);
+                break;
+            case 2:
+                printf(">> Deposit money\n");
+                deposit_money(&account);
+                break;
+            case 3:
+                printf(">> Withdraw money\n");
+                withdraw_money(&account);
+                break;
+            case 4:
+                printf(">> Display Account\n");
+                display_account(&account);
+                break;
+            case 5:
+                printf("Thank you!!!\nHope you had a safe transaction :)\n");
+                return 0;
+            default:
+                printf("This option doesn't exist. Please try again!\n");
+        }
+
+        printf("Do you want to select any other option? Press Y/N\n");
+        printf("If you want to exit then press 'N'\n");
+        scanf(" %c", &option);
+
+        if (option == 'N' || option == 'n') {
+            printf("Thank you!!!\nHope you had a safe transaction :)\n");
+            return 0;
+        }
+    } while (option == 'Y' || option == 'y');
+
+    return 0;
 }
